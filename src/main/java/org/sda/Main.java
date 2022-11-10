@@ -1,5 +1,7 @@
 package org.sda;
 
+import org.sda.concurrency.StopWatchRunnableImpl;
+import org.sda.concurrency.StopWatchThread;
 import org.sda.model.Person;
 
 import java.util.Comparator;
@@ -10,7 +12,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         //LAMBDA EXPRESSION
         //Predicate
         Person person = new Person("Vinod", "John", "vinod", 20);
@@ -43,10 +45,6 @@ public class Main {
         //Operator
         UnaryOperator<Integer> toSquare = i -> i * i;
         System.out.println(toSquare.apply(4)); // apply() should be called always
-
-
-
-
 
 
 
@@ -149,6 +147,33 @@ public class Main {
         Person.Customer customer = new Person.Customer(); // Difference in the object instantiation
         customer.username(person5);
         System.out.println(person5.getUsername());
+
+
+        //CONCURRENCY
+        System.out.println("Main is running after nested classes......");
+        Thread.sleep(5000);
+        System.out.println("Thread test ended!");
+
+
+        //Thread - Class
+        StopWatchThread stopWatchThread = new StopWatchThread("SW1");
+        StopWatchThread stopWatchThread2 = new StopWatchThread("SW2");
+
+        stopWatchThread.start(); // Starting the StopWatchThread (object.start cause extends class)
+        stopWatchThread2.start(); // Starting the second StopWatch
+        System.out.println("Main thread starts running");
+        Thread.sleep(5000); // This is for main method
+        System.out.println("Main thread is still running..");
+        Thread.sleep(3000);
+        System.out.println("Main thread end running");
+
+        //Runnable - Interface
+        System.out.println("Runnable StopWatch started..");
+        Thread stopWatchRunnableThread = new Thread(new StopWatchRunnableImpl());
+        stopWatchRunnableThread.start();
+
+
+
     }
 
     //Old-school way of method definition

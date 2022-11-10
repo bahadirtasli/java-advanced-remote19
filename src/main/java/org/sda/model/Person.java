@@ -9,6 +9,7 @@ import lombok.ToString;
  * Person model
  *
  * @author bahadir tasli
+ *
  */
 @AllArgsConstructor
 @Getter

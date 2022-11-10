@@ -1,120 +1,104 @@
 package org.sda;
 
-import org.sda.model.*;
+import org.sda.abstracts.Food;
+import org.sda.abstracts.Fruit;
+import org.sda.abstracts.Veggie;
+import org.sda.exceptions.PersonNotFoundException;
+import org.sda.models.Person;
+import org.sda.services.PersonService;
+import org.sda.services.implementations.PersonServiceImpl;
 
-import java.util.Arrays;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        //ENCAPSULATION
-        //No-arg constructor call
+        //INTERFACE
         Person person = new Person();
-        System.out.println(person.toString());
-        System.out.println(person.getId());
+        person.setFirstName("Vinod");
+        person.setLastName("John");
+        person.setAge(10);
 
-        //All-argument constructor call
-        Person person1 = new Person(12345L, "Vinod", "John", "abc@gmail.com", "+37258964253", "Tartu tee, Tallinn");
-        System.out.println(person1.toString());
-        System.out.println(person1.getEmail());
+        // Left side should be interface name and Right side should be interface's implementation class name
+        PersonService personService = (PersonService) new PersonServiceImpl();
 
-        Person person2 = new Person();
-        person2.setFirstName("Tony");
-        person2.setLastName("Stark");
-        System.out.println(person2.getFirstName());
-        System.out.println(person2.getLastName());
+        // Implementation method calls
+        System.out.println("Person's birth year: " + personService.getPersonBirthYear(person.getAge()));
+        System.out.println("Person's full name: " + personService.getPersonFullName(person));
 
-
-        Dog dog = new Dog(true, "GERMAN SHEPPERD");
-        System.out.println(dog.toString());
-        System.out.println(dog.getAge());
-        System.out.println(dog.getWeight());
+        System.out.println("Person's last name: " + person.getLastName());
 
 
-        //INHERITANCE
-        Passenger passenger = new Passenger(PaymentType.CARD, "Parnu");
-        passenger.setEmail("passenger@gmail.com"); // Access Person fields using Passenger object
+        //EXCEPTION
+        //Exception handling
+        try {
+            int[] intArray = {1, 4, 56, 7};
 
-        PrivatePassenger privatePassenger = new PrivatePassenger(PaymentType.CARD, "Viljandi");
-        privatePassenger.setPersonalIDCode("238746521873"); //Access PrivatePassenger's field
-        privatePassenger.setDestinationAddress("tartu"); //Access Passenger's field
-        privatePassenger.setPhoneNumber("+3722387647654"); //Access Person's field
-
-
-        //Overriding
-        Person personOverride = new Person();
-        personOverride.setEmail("vinodjohn@gmail.com");
-        System.out.println(personOverride.getEmail());
-
-        Passenger passengerOverride = new Passenger();
-        passengerOverride.setEmail("vinodjohn@gmail.com");
-        System.out.println(passengerOverride.getEmail());
-
-
-        //Polymorphism
-        Person person3 = new Person(12345L, "Parnu");
-        Person person4 = new Passenger(PaymentType.CARD, "Viljandi");
-        System.out.println(person3.toString());
-        System.out.println(person4.toString());
-
-
-        // Calling parent methods
-        Passenger passenger1 = new Passenger();
-        passenger1.setAddress("Tallinn"); // Person.address
-        passenger1.setDestinationAddress("Tartu"); // Passenger.destinationAddress
-        System.out.println(passenger1.getAddresses());
-
-
-        //Calling parent's hidden field
-        passenger1.getHiddenAlive();
-
-        //passing parameters
-        Passenger passenger2 = new Passenger(123456L, "Tallinn", PaymentType.CASH, "Tartu");
-        printPersonAddress(passenger2);
-        printPassengerWithPrefix("Passenger: ", passenger2);
-
-
-        //Composition exercise
-        Muzzle muzzle = new Muzzle();
-        muzzle.setId(890L);
-        muzzle.setNoiseRange(10);
-        muzzle.setTooNoisy(true);
-
-
-        Dog dog1 = new Dog(true, "DOBER");
-        dog1.setMuzzle(muzzle);
-
-        System.out.println(dog1.getMuzzle().toString());
-
-
-        //enums
-        System.out.println(PaymentType.CARD); // prints enum 'CARD'
-        System.out.println(Arrays.toString(PaymentType.values())); // prints all the enum values
-        System.out.println(PaymentType.BANK_TRANSFER.getValue()); // prints the value of the enum '3'
-
-        // looping enums
-        for(PaymentType paymentType: PaymentType.values()) {
-            System.out.println(paymentType.name());
+            for (int i = 0; i < intArray.length; i++) {
+                System.out.println(intArray[i]);
+            }
+        } catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException) {
+            System.out.println("The number cannot be printed because its unavailable in the array!");
+        } catch (Exception exception) {
+            System.out.println("Exception being caught");
+        } finally { // This blocked will be executed irrespective of catch blocks
+            int a = 15;
+            System.out.println("Finally executed, a: " + a);
         }
 
-        // enum method overriding
-        System.out.println(PaymentType.MOBILE_BANKING.toString());
+        // Combining multiple exceptions
+        try {
+            int y = 10 / 0; // This line should throw an exception
+        } catch(ArithmeticException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+            System.out.println("The value of y is not determined, Error:" + e.getLocalizedMessage());
+        }
 
 
-        //Enum exercise
-        System.out.println(">>>>>>>>>>>>>PLANETS<<<<<<<<<<<<<<<<");
-        System.out.println(Planets.JUPITER.toString());
-        System.out.println("Distance of " + Planets.JUPITER.name() + " from Earth: " + Planets.JUPITER.distanceFromEarth());
-        System.out.println("-------------------");
-        System.out.println(Planets.MARS.toString());
-        System.out.println("Distance of " + Planets.MARS.name() + " from Earth: " + Planets.MARS.distanceFromEarth());
+        //Custom / user-defined exceptions
+        Person testPerson;
+
+        try {
+            testPerson = personService.findPersonByFirstName("Helar");
+        } catch (PersonNotFoundException e) {
+            System.out.println(e.getLocalizedMessage());
+
+            // alternative code
+            testPerson = new Person();
+            testPerson.setFirstName("Unknown");
+            testPerson.setLastName("Unknown last");
+            testPerson.setAge(10);
+        }
+
+        System.out.println(testPerson.toString());
+
+
+        // H.W. Exercise - Exception handling
+        try {
+            // displayNumber();
+        } catch(InputMismatchException e) {
+            System.out.println(e.getLocalizedMessage());
+            displayNumber();
+        }
+
+
+        // Abstract class
+        Fruit fruit = new Fruit("Red");
+        fruit.eat();
+
+        Food food = new Veggie("Green"); // We cannot instantiate (new Food()) but you can assign the child class to the abstract class
+        food.eat();
     }
 
-
-    private static void printPersonAddress(Person person) {
-        System.out.println(person.getAddress());
-    }
-
-    private static void printPassengerWithPrefix(String prefix, Object object) {
-        System.out.println(prefix + object);
+    private static void displayNumber() {
+        Scanner scanner = new Scanner(System.in);
+        if(scanner.hasNextInt()) {
+            int i = scanner.nextInt();
+            System.out.println("int -> " + i);
+        } else if(scanner.hasNextDouble()) {
+            double d = scanner.nextDouble();
+            System.out.println("double -> " + d);
+        } else {
+            throw new InputMismatchException("Hey! that's not a value, try once more!");
+        }
     }
 }

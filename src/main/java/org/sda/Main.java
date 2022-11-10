@@ -1,120 +1,220 @@
 package org.sda;
 
-import org.sda.model.*;
+import org.sda.generics.*;
 
-import java.util.Arrays;
+import java.io.*;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 public class Main {
+
+    //@SuppressWarnings("unchecked")
     public static void main(String[] args) {
-        //ENCAPSULATION
-        //No-arg constructor call
-        Person person = new Person();
-        System.out.println(person.toString());
-        System.out.println(person.getId());
+        // GENERIC TYPE
+        Fruit fruit = new Fruit();
+        fruit.setName("Apple");
+        fruit.setColor("Green");
+        fruit.setPrice(BigDecimal.valueOf(1.99)); //converting a double to BigDecimal
 
-        //All-argument constructor call
-        Person person1 = new Person(12345L, "Vinod", "John", "abc@gmail.com", "+37258964253", "Tartu tee, Tallinn");
-        System.out.println(person1.toString());
-        System.out.println(person1.getEmail());
+        GenericFood<Fruit> genericFoodWithFruit = new GenericFood<>(fruit);
+        System.out.println(genericFoodWithFruit.getItem());
 
-        Person person2 = new Person();
-        person2.setFirstName("Tony");
-        person2.setLastName("Stark");
-        System.out.println(person2.getFirstName());
-        System.out.println(person2.getLastName());
+        String str = "I'm a great developer!";
+        GenericFood<String> genericFoodWithString = new GenericFood<>(str);
+        System.out.println(genericFoodWithString.getItem());
 
+        genericFoodWithString.setItem("I'm a good person!");
+        System.out.println(genericFoodWithString.getItem());
 
-        Dog dog = new Dog(true, "GERMAN SHEPPERD");
-        System.out.println(dog.toString());
-        System.out.println(dog.getAge());
-        System.out.println(dog.getWeight());
+        //Generic type - extends
+        Vegetable vegetable = new Vegetable();
+        GenericExtendFood<Vegetable> vegetableGenericExtendFood = new GenericExtendFood<>(vegetable);
+        System.out.println(vegetableGenericExtendFood.getRating());
 
 
-        //INHERITANCE
-        Passenger passenger = new Passenger(PaymentType.CARD, "Parnu");
-        passenger.setEmail("passenger@gmail.com"); // Access Person fields using Passenger object
+        //Generic type - interface
+        Snack snack1 = new Snack(5);
+        Snack snack2 = new Snack(3);
+        System.out.println("Snack 1 is better than Snack 2: " + snack1.isBetter(snack2));
 
-        PrivatePassenger privatePassenger = new PrivatePassenger(PaymentType.CARD, "Viljandi");
-        privatePassenger.setPersonalIDCode("238746521873"); //Access PrivatePassenger's field
-        privatePassenger.setDestinationAddress("tartu"); //Access Passenger's field
-        privatePassenger.setPhoneNumber("+3722387647654"); //Access Person's field
+        //LIST
+        List<String> animalList = new ArrayList<>();
+        animalList.add("Lion"); // 0
+        animalList.add("Tiger"); // 1
+        animalList.add("Dog"); // 2
+        animalList.add("Cat");
+        animalList.add("Bear");
+        animalList.add("Panda");
 
+        System.out.println(animalList.get(1)); // prints tiger
 
-        //Overriding
-        Person personOverride = new Person();
-        personOverride.setEmail("vinodjohn@gmail.com");
-        System.out.println(personOverride.getEmail());
+        animalList.remove(1); // tiger will be deleted
+        animalList.remove("Dog");
 
-        Passenger passengerOverride = new Passenger();
-        passengerOverride.setEmail("vinodjohn@gmail.com");
-        System.out.println(passengerOverride.getEmail());
-
-
-        //Polymorphism
-        Person person3 = new Person(12345L, "Parnu");
-        Person person4 = new Passenger(PaymentType.CARD, "Viljandi");
-        System.out.println(person3.toString());
-        System.out.println(person4.toString());
-
-
-        // Calling parent methods
-        Passenger passenger1 = new Passenger();
-        passenger1.setAddress("Tallinn"); // Person.address
-        passenger1.setDestinationAddress("Tartu"); // Passenger.destinationAddress
-        System.out.println(passenger1.getAddresses());
-
-
-        //Calling parent's hidden field
-        passenger1.getHiddenAlive();
-
-        //passing parameters
-        Passenger passenger2 = new Passenger(123456L, "Tallinn", PaymentType.CASH, "Tartu");
-        printPersonAddress(passenger2);
-        printPassengerWithPrefix("Passenger: ", passenger2);
-
-
-        //Composition exercise
-        Muzzle muzzle = new Muzzle();
-        muzzle.setId(890L);
-        muzzle.setNoiseRange(10);
-        muzzle.setTooNoisy(true);
-
-
-        Dog dog1 = new Dog(true, "DOBER");
-        dog1.setMuzzle(muzzle);
-
-        System.out.println(dog1.getMuzzle().toString());
-
-
-        //enums
-        System.out.println(PaymentType.CARD); // prints enum 'CARD'
-        System.out.println(Arrays.toString(PaymentType.values())); // prints all the enum values
-        System.out.println(PaymentType.BANK_TRANSFER.getValue()); // prints the value of the enum '3'
-
-        // looping enums
-        for(PaymentType paymentType: PaymentType.values()) {
-            System.out.println(paymentType.name());
+        for (String animal : animalList) {
+            System.out.println(animal);
         }
 
-        // enum method overriding
-        System.out.println(PaymentType.MOBILE_BANKING.toString());
+        Iterator<String> stringIterator = animalList.listIterator();
+
+        while (stringIterator.hasNext()) {
+            System.out.println(stringIterator.next() + " ,");
+        }
+
+        // List of items to be removed
+        List<String> removeAnimalList = new ArrayList<>();
+        removeAnimalList.add("Cat");
+        removeAnimalList.add("Panda");
+
+        animalList.removeAll(removeAnimalList);
+
+        //Final Removed list
+        for (String animal : animalList) {
+            System.out.println(animal);
+        }
 
 
-        //Enum exercise
-        System.out.println(">>>>>>>>>>>>>PLANETS<<<<<<<<<<<<<<<<");
-        System.out.println(Planets.JUPITER.toString());
-        System.out.println("Distance of " + Planets.JUPITER.name() + " from Earth: " + Planets.JUPITER.distanceFromEarth());
-        System.out.println("-------------------");
-        System.out.println(Planets.MARS.toString());
-        System.out.println("Distance of " + Planets.MARS.name() + " from Earth: " + Planets.MARS.distanceFromEarth());
+        //SET
+        Set<String> countrySet = new HashSet<>(); // Non-sorted, randomly stored
+        countrySet.add("Eesti");    // 525632
+        countrySet.add("Saksmaa");  // 152635
+        countrySet.add("Poola");
+        countrySet.add("Rootsi");
+        // countrySet.add("Eesti"); -> Duplicates not allowed!
+
+        for (String country : countrySet) {
+            System.out.println(country);
+        }
+
+        System.out.println("Before sorting: " + countrySet);
+        TreeSet<String> countryTreeSet = new TreeSet<>(countrySet); // Stored as Sorted
+        System.out.println("After sorting: " + countryTreeSet);
+
+
+        //MAP
+        Map<String, String> fullName = new HashMap<>(); // Not stored as sorted
+        fullName.put("Vinod", "John");
+        fullName.put("Martti", "Triksberg");
+        fullName.put("Marko", "Piir");
+        // fullName.put("Marko", "Ennuste"); - > not possible as one key assign to one value. Duplicate key not allowed.
+        System.out.println(fullName);
+
+        System.out.println(fullName.get("Vinod"));
+        System.out.println(fullName.remove("Marko"));
+        System.out.println(fullName);
+
+
+        Map<String, Integer> ageMap = new HashMap<>();
+        ageMap.put("Vinod", 15);
+        ageMap.put("Maria", 28);
+
+        //Map of List
+        Map<String, List<String>> friendsMap = new HashMap<>();
+        List<String> vinodFriendList = List.of("Tony", "Mark", "Antony");
+        List<String> mariaFriendList = List.of("Angelin", "Aivi", "Eva");
+        friendsMap.put("Vinod", vinodFriendList);
+        friendsMap.put("Maria", mariaFriendList);
+
+        //Map of map
+        Map<String, Map<String, String>> detailsMap = new HashMap<>();
+        Map<String, String> vinodInfoMap = new HashMap<>();
+        vinodInfoMap.put("age", "15");
+        vinodInfoMap.put("birthPlace", "India");
+        vinodInfoMap.put("residence", "Estonia");
+        vinodInfoMap.put("phone", "123456");
+        detailsMap.put("Vinod", vinodInfoMap);
+
+
+        //I/O
+        File absoluteFile = new File("C:\\Users\\Ceyda\\IdeaProjects\\java-advanced-remote19\\src\\main\\resources\\myText.txt");
+        File relativeFile = new File("myText.txt");
+
+        //File reading
+        try {
+            FileReader fileReader = new FileReader(absoluteFile);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String fileLine; // To store the line of text from the file
+
+            while ((fileLine = bufferedReader.readLine()) != null) {
+                System.out.println(fileLine);
+            }
+
+            bufferedReader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //File writing
+        try {
+            FileWriter fileWriter = new FileWriter(absoluteFile, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            String fileLine = "\nI can write an error-less Java code :D";
+            bufferedWriter.write(fileLine);
+            bufferedWriter.flush();
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Serialization: Writing an object to a file
+        String fileName = "file.ser";
+
+        try{
+            FileOutputStream file = new FileOutputStream(fileName);
+            ObjectOutputStream outputStream = new ObjectOutputStream(file);
+
+            outputStream.writeObject(fruit);
+            outputStream.close();
+            file.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Deserialization: To get/read an object from a file.
+        Fruit deserializedFruit;
+
+        try{
+            FileInputStream file = new FileInputStream(fileName);
+            ObjectInputStream inputStream = new ObjectInputStream(file);
+
+            deserializedFruit = (Fruit) inputStream.readObject();
+
+            inputStream.close();
+            file.close();
+
+            System.out.println(deserializedFruit.toString());
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        // New I/O
+        Path absolutePath = Paths.get("C:\\Users\\Ceyda\\IdeaProjects\\java-advanced-remote19\\src\\main\\resources\\myText.txt");
+        Path relativePath = Paths.get("myText.txt");
+
+        try {
+            //File Reading
+            List<String> fileLines = Files.readAllLines(absolutePath, StandardCharsets.UTF_8);
+
+            // Just to print the file which was read above
+            for(String fileLine: fileLines) {
+                System.out.println(fileLine);
+            }
+
+            //File writing
+            List<String> fileLinesToWrite = List.of("I love Java", "Estonia is my country!");
+            Files.write(absolutePath, fileLinesToWrite, StandardOpenOption.APPEND);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-
-    private static void printPersonAddress(Person person) {
-        System.out.println(person.getAddress());
-    }
-
-    private static void printPassengerWithPrefix(String prefix, Object object) {
-        System.out.println(prefix + object);
-    }
 }
